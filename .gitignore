@@ -1,2 +1,3 @@
 .vscode/settings.json
 blog_venv/
+.vscode/launch.json
