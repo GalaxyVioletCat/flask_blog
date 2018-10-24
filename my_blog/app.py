@@ -2,12 +2,13 @@ from flask import Flask, render_template_string, redirect
 from sqlalchemy import create_engine, MetaData
 from flask_login import UserMixin, LoginManager, login_user, logout_user
 from flask_blogging import SQLAStorage, BloggingEngine
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "secret"  # for WTF-forms and login
 app.config["BLOGGING_URL_PREFIX"] = "/blog"
 app.config["BLOGGING_DISQUS_SITENAME"] = "test"
-app.config["BLOGGING_SITEURL"] = "http://localhost:8000"
+app.config["BLOGGING_SITEURL"] = "http://localhost:5000"
 app.config["BLOGGING_SITENAME"] = "My Site"
 app.config["BLOGGING_KEYWORDS"] = ["blog", "meta", "keywords"]
 app.config["FILEUPLOAD_IMG_FOLDER"] = "fileupload"
@@ -15,12 +16,19 @@ app.config["FILEUPLOAD_PREFIX"] = "/fileupload"
 app.config["FILEUPLOAD_ALLOWED_EXTENSIONS"] = ["png", "jpg", "jpeg", "gif"]
 # 
 # extensions
-engine = create_engine('sqlite:////tmp/blog.db')
-meta = MetaData()
-sql_storage = SQLAStorage(engine, metadata=meta)
-blog_engine = BloggingEngine(app, sql_storage)
+
+db = SQLAlchemy(app)
+storage = SQLAStorage(db=db)
+blog_engine = BloggingEngine(app, storage)
 login_manager = LoginManager(app)
-meta.create_all(bind=engine)
+
+db.create_all()
+
+#engine = create_engine('sqlite:////tmp/blog.db')
+#meta = MetaData()
+#sql_storage = SQLAStorage(engine, metadata=meta)
+
+#meta.create_all(bind=engine)
 
 
 class User(UserMixin):
